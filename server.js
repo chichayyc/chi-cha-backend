@@ -5,10 +5,15 @@ const cheerio = require('cheerio');
 const cors = require('cors');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000; // Use the port provided by Render or fallback to 3000
 
 // Enable CORS for React Native app
 app.use(cors());
+
+// Default route for the root path
+app.get('/', (req, res) => {
+  res.send('Welcome to the Chi-Cha Lounge Events API. Use /api/events to fetch events.');
+});
 
 // Endpoint to fetch events
 app.get('/api/events', async (req, res) => {
@@ -25,9 +30,9 @@ app.get('/api/events', async (req, res) => {
     // Scrape the "Upcoming Events" section
     $('.eventon_list_event').each((index, element) => {
       const title = $(element).find('.evcal_event_title').text().trim(); // Extract event title
-      const date = $(element).find('.evo_date').text().trim(); // Extract event date
+      const dateTime = $(element).find('.evo_date').text().trim(); // Extract event date and time
       const location = $(element).find('.evo_location').text().trim(); // Extract event location
-      events.push({ title, date, location });
+      events.push({ title, dateTime, location });
     });
 
     // Send the scraped events as JSON
@@ -40,5 +45,5 @@ app.get('/api/events', async (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
